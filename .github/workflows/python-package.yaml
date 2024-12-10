@@ -10,8 +10,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-conda:
-    name: build-${{ matrix.os.os }}-conda
+  build:
+    name: build-${{ matrix.os.os }}
     runs-on: ${{ matrix.os.os }}
     strategy:
       matrix:
