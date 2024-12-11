@@ -1,3 +1,7 @@
+[![PyPI Downloads](https://static.pepy.tech/badge/biomed-multi-view)](https://pepy.tech/projects/biomed-multi-view)
+[![GitHub Clones](https://img.shields.io/badge/dynamic/json?color=success&label=Clone&query=count&url=https://gist.githubusercontent.com/mosheraboh/519a49d9073e04d2cc98dc7bb5805677/raw/clone.json&logo=github)](https://github.com/MShawon/github-clone-count-badge)
+
+
 # Introduction
 
 This repository contains the implementation of the Multi-view Molecular Embedding with Late Fusion (MMELON) architecture presented in our preprint [Multi-view biomedical foundation models for molecule-target and property prediction](https://arxiv.org/abs/2410.19704). MMELON is a flexible approach to aggregate multiple views (sequence, image, graph) of molecules in a foundation model setting. While models based on single view representation typically performs well on some downstream tasks and not others, the multi-view model performs robustly across a wide range of property prediction tasks encompassing ligand-protein binding, molecular solubility, metabolism and toxicity. It has been applied to screen compounds against a large (> 100 targets) set of G Protein-Coupled receptors (GPCRs) to identify strong binders for 33 targets related to Alzheimer’s disease, which are validated through structure-based modeling and identification of key binding motifs.
