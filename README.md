@@ -1,5 +1,5 @@
 [![PyPI Downloads](https://static.pepy.tech/badge/biomed-multi-view)](https://pepy.tech/projects/biomed-multi-view)
-[![GitHub Clones](https://img.shields.io/badge/dynamic/json?color=success&label=Clone&query=count&url=https://gist.githubusercontent.com/mosheraboh/519a49d9073e04d2cc98dc7bb5805677/raw/clone.json&logo=github)](https://github.com/MShawon/github-clone-count-badge)
+[![GitHub Clones](https://img.shields.io/badge/dynamic/json?color=success&label=Clone&query=count&url=https://gist.githubusercontent.com/mosheraboh/5dfef582f7add187650c22224a07a52d/raw/clone.json&logo=github)](https://github.com/MShawon/github-clone-count-badge)
 
 
 # Introduction
