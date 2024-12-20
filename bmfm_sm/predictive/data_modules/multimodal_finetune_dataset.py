@@ -112,7 +112,7 @@ class MultiModalFinetuneDataPipeline(MPPFinetuneDataset):
             if ns.FIELD_LABEL not in collated:
                 collated[ns.FIELD_LABEL] = graph_gnn_batch_data["y"]
 
-        collated[ns.FIELD_LABEL] = collated[ns.FIELD_LABEL].to(torch.int32)
+        collated[ns.FIELD_LABEL] = collated[ns.FIELD_LABEL].to(torch.float32)
         return collated
 
     def get_feature_fn(self):

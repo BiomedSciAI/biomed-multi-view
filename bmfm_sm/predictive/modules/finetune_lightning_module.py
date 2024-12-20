@@ -307,7 +307,7 @@ class FineTuneLightningModule(pl.LightningModule):
                     loss = loss / torch.sum(valid_mask)
 
         elif self.task_type == TaskType.REGRESSION.value:
-            loss = self.criterion(y_hat, y.float())
+            loss = self.criterion(y_hat, y)
 
         self.log(f"{step_type}_loss", loss, prog_bar=True, logger=True)
         return loss
@@ -321,6 +321,10 @@ class FineTuneLightningModule(pl.LightningModule):
         if y.ndim == 0:
             y = y.unsqueeze(dim=0)
         y_hat = y_hat.reshape(y.shape)
+        if self.task_type == "classification":
+            y = y.to(torch.int32)
+        elif self.task_type == "regression":
+            y = y.to(torch.float32)
 
         self._update_metrics(y_hat, y, step_type)
         return self._compute_loss(y_hat, y, step_type), y, y_hat
