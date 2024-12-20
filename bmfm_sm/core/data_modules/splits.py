@@ -241,7 +241,7 @@ def scaffold_split_balanced_train_val_test(
     frac_valid=0.1,
     frac_test=0.1,
     balanced: bool = False,
-    seed: int = 0,
+    seed: int = 42,
 ):
     """
     Split a dataset by scaffold so that no molecules sharing a scaffold are in the same split.
@@ -445,3 +445,41 @@ def calculate_task_weights(train_ids, data_file):
 
     weights = np.array(weights, dtype="float")
     return weights
+
+
+def calculate_label_means(train_ids, data_file):
+    """
+    Returns
+    -------
+    - label_means (np.array): A numpy array of shape (num_tasks, 1), where each row contains the
+                          label means for each task.
+
+    """
+    df = pd.read_csv(data_file)
+    if "index" not in df.columns:
+        raise ValueError("CSV file does not contain 'index' column")
+    df_train = df[df["index"].isin(train_ids)]
+
+    labels_train = df_train["label"].apply(
+        lambda x: np.array([float(i) for i in str(x).split()])
+        if isinstance(x, str)
+        else np.array([x])
+    )
+
+    labels_train = np.stack(labels_train.values)
+
+    num_tasks = labels_train.shape[1]
+    label_means = []
+
+    for task_idx in range(num_tasks):
+        task_labels = labels_train[:, task_idx]
+        valid_task_labels = task_labels[task_labels != -1]
+
+        if len(valid_task_labels) == 0:
+            means = [0]
+        else:
+            means = [np.mean(valid_task_labels)]
+        label_means.append(means)
+
+    label_means = np.array(label_means, dtype="float")
+    return label_means
