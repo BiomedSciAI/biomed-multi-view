@@ -79,7 +79,7 @@ class FineTuneLightningModule(pl.LightningModule):
         self.save_hyperparameters()
 
         # Initialize the BaseModel and load the passed in checkpoint or the default pretrained:
-        logging.info(f"Initializaing model with params {model_params}")
+        logging.info(f"Initializing model with params {model_params}")
         model_class = FineTuneLightningModule.import_class(base_model_class)
         self.model = model_class(**model_params)
 
@@ -108,6 +108,7 @@ class FineTuneLightningModule(pl.LightningModule):
             use_norm=finetuning_args.get("use_norm", True),
             activation=finetuning_args.get("head_activation", nn.GELU),
             dropout_prob=finetuning_args.get("head_dropout", 0.2),
+            bias_terms=finetuning_args.get("bias_terms", []),
         )
         # Handles the initialization of the prediction head based on the user config
         self.initialization = finetuning_args.get("initialization", "default")
@@ -307,7 +308,7 @@ class FineTuneLightningModule(pl.LightningModule):
                     loss = loss / torch.sum(valid_mask)
 
         elif self.task_type == TaskType.REGRESSION.value:
-            loss = self.criterion(y_hat, y.float())
+            loss = self.criterion(y_hat, y)
 
         self.log(f"{step_type}_loss", loss, prog_bar=True, logger=True)
         return loss
@@ -321,6 +322,10 @@ class FineTuneLightningModule(pl.LightningModule):
         if y.ndim == 0:
             y = y.unsqueeze(dim=0)
         y_hat = y_hat.reshape(y.shape)
+        if self.task_type == "classification":
+            y = y.to(torch.int32)
+        elif self.task_type == "regression":
+            y = y.to(torch.float32)
 
         self._update_metrics(y_hat, y, step_type)
         return self._compute_loss(y_hat, y, step_type), y, y_hat
@@ -615,6 +620,7 @@ class FineTuneLightningModule(pl.LightningModule):
 
     @staticmethod
     def init_head_weights(module, initialization="default"):
+        last_bias = None
         for name, layer in module.named_modules():
             if isinstance(layer, nn.Linear):
                 if initialization == "xavier":
@@ -629,7 +635,12 @@ class FineTuneLightningModule(pl.LightningModule):
                     raise ValueError(
                         f"Initialization strategy {initialization} is not supported."
                     )
-                nn.init.zeros_(layer.bias)
+                last_bias = layer.bias.detach().tolist()
+
+        if last_bias is not None:
+            logging.info(
+                f"Biases in the last layer after initializing head weights: {last_bias}"
+            )
 
     # UTILITY FUNCTIONS
 

@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from functools import reduce
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -131,6 +132,7 @@ class MultiTaskPredictionHead(nn.Module):
         use_norm=False,
         dropout_prob=0.2,
         softmax=False,
+        bias_terms=[],
     ):
         super().__init__()
         self.num_tasks = num_tasks
@@ -149,7 +151,7 @@ class MultiTaskPredictionHead(nn.Module):
             assert num_classes_per_task == 1
 
         self.shared_task_head = self._build_head(
-            input_dim, hidden_dims, activation, use_norm, dropout_prob, head
+            input_dim, hidden_dims, activation, use_norm, dropout_prob, head, bias_terms
         )
 
         if isinstance(self.num_classes_per_task, list):
@@ -181,9 +183,17 @@ class MultiTaskPredictionHead(nn.Module):
             return task_logits
 
     def _build_head(
-        self, input_dim, hidden_dims, activation, use_norm, dropout_prob, head
+        self,
+        input_dim,
+        hidden_dims,
+        activation,
+        use_norm,
+        dropout_prob,
+        head,
+        bias_terms,
     ):
         layers = []
+        layer_num = -1
         if head == "mlp":
             layers.append(nn.Linear(input_dim, hidden_dims[0]))
 
@@ -216,8 +226,21 @@ class MultiTaskPredictionHead(nn.Module):
             )
             if use_norm:
                 layers.append(nn.LayerNorm(self.num_tasks * self.num_classes_per_task))
+                layer_num = layer_num - 1
             if activation is not None:
                 layers.append(self.activation)
+                layer_num = layer_num - 1
+        bias_terms = np.array(list(bias_terms))
+
+        if bias_terms.size != 0:
+            assert len(bias_terms) == len(
+                layers[layer_num].bias.detach().tolist()
+            ), f"Length of bias_values must match output dimension: {len(bias_terms)}, {len(layers[layer_num].bias.detach().tolist())}"
+
+            with torch.no_grad():
+                layers[layer_num].bias.data = torch.tensor(
+                    bias_terms, dtype=layers[layer_num].bias.dtype
+                ).view(-1)
 
         return nn.Sequential(*layers)
 

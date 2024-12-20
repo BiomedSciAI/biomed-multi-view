@@ -2,7 +2,7 @@
 {{ card_data }}
 ---
 
-# {{ hf_ft_model_path }}
+# {{ hf_model_name }}
 `biomed.sm.mv-te-84m` is a multimodal biomedical foundation model for small molecules created using **MMELON** (**M**ulti-view **M**olecular **E**mbedding with **L**ate Fusi**on**), a flexible approach to aggregate multiple views (sequence, image, graph) of molecules in a foundation model setting. While models based on single view representation typically performs well on some downstream tasks and not others, the multi-view model performs robustly across a wide range of property prediction tasks encompassing ligand-protein binding, molecular solubility, metabolism and toxicity. It has been applied to screen compounds against a large (> 100 targets) set of G Protein-Coupled receptors (GPCRs) to identify strong binders for 33 targets related to Alzheimer’s disease, which are validated through structure-based modeling and identification of key binding motifs [Multi-view biomedical foundation models for molecule-target and property prediction](https://arxiv.org/abs/2410.19704).
 
 - **Developers:** IBM Research
@@ -185,4 +185,3 @@ If you found our work useful, please consider giving a star to the repo and cite
       url={https://arxiv.org/abs/2410.19704},
 }
 ```
-c

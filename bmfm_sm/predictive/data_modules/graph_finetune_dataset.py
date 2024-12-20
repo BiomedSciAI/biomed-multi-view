@@ -103,7 +103,7 @@ class Graph2dFinetuneDataPipeline(MPPFinetuneDataset):
         # Initialize collated result
         collated = {}
         y = torch.cat(ys)
-        collated["y"] = y.to(torch.int64)
+        collated["y"] = y
         collated["node_num"] = torch.LongTensor(node_nums)
         collated["node_data"] = torch.cat(xs)
         collated["edge_num"] = torch.LongTensor(edge_nums)

@@ -66,11 +66,7 @@ class FinetuneCLI(LightningCLI):
                 config["ckpt_path"] = last_files[-1][0]
 
         # Check if checkpoint exists and update config file
-        ckpt_found = (
-            config.get("ckpt_path")
-            and os.path.isfile(config["ckpt_path"])
-            and self.subcommand != "fit"
-        )
+        ckpt_found = config.get("ckpt_path") and os.path.isfile(config["ckpt_path"])
 
         if not ckpt_found:
             if "subcommand" in self.config:
