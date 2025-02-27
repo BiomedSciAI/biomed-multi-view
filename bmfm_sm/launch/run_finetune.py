@@ -50,6 +50,7 @@ class FinetuneCLI(LightningCLI):
 
         if (
             self.subcommand != "test"
+            and config.get("ckpt_path")
             and os.path.exists(os.path.dirname(config["ckpt_path"]))
             and "last" not in os.path.basename(config["ckpt_path"])
         ):
@@ -153,6 +154,7 @@ def select_option(option_name, provided_value, path, option_type="dir"):
 
 
 @click.command()
+@click.option("--config", type=click.Path(exists=True), help="Path to an explicit config file")
 @click.option("--model", help="Model name")
 @click.option("--dataset-group", help="Dataset group name")
 @click.option("--split-strategy", help="Split strategy name")
@@ -167,26 +169,30 @@ def select_option(option_name, provided_value, path, option_type="dir"):
     multiple=True,
     help="Override parameters in key=value format (e.g., trainer.max_epochs=10)",
 )
-def main(model, dataset_group, split_strategy, dataset, mode, override):
-    base_path = Path(CONFIGS_DIR)
-    model = select_option("model", model, base_path, "dir")
-    dataset_group_path = base_path / model
-    dataset_group = select_option(
-        "dataset group", dataset_group, dataset_group_path, "dir"
-    )
-    split_strategy_path = dataset_group_path / dataset_group
-    split_strategy = select_option(
-        "split strategy", split_strategy, split_strategy_path, "dir"
-    )
-    dataset_path = split_strategy_path / split_strategy
-    dataset = select_option("dataset", dataset, dataset_path, "dir")
+def main(config, model, dataset_group, split_strategy, dataset, mode, override):
+    if config:
+        logging.info(f"Using provided config file: {config}")
+        config_file = config
+    else:
+        base_path = Path(CONFIGS_DIR)
+        model = select_option("model", model, base_path, "dir")
+        dataset_group_path = base_path / model
+        dataset_group = select_option(
+            "dataset group", dataset_group, dataset_group_path, "dir"
+        )
+        split_strategy_path = dataset_group_path / dataset_group
+        split_strategy = select_option(
+            "split strategy", split_strategy, split_strategy_path, "dir"
+        )
+        dataset_path = split_strategy_path / split_strategy
+        dataset = select_option("dataset", dataset, dataset_path, "dir")
 
-    config_file = find_config_file(
-        model, dataset_group, split_strategy, dataset, seed=101
-    )
-    if not os.path.exists(config_file):
-        logging.error(f"Config file not found: {config_file}")
-        sys.exit(1)
+        config_file = find_config_file(
+            model, dataset_group, split_strategy, dataset, seed=101
+        )
+        if not os.path.exists(config_file):
+            logging.error(f"Config file not found: {config_file}")
+            sys.exit(1)
 
     config = OmegaConf.load(config_file)
     OmegaConf.resolve(config)
