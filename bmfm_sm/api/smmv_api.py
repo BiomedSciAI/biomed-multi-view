@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from bmfm_sm.api.utils import fix_finetuning_args
 from bmfm_sm.api.dataset_registry import DatasetRegistry
 from bmfm_sm.api.model_registry import ModelRegistry
 from bmfm_sm.core.data_modules.namespace import LateFusionStrategy, Modality, TaskType
@@ -115,7 +116,9 @@ class SmallMoleculeMultiViewModel(nn.Module):
                     agg_weight_freeze=model_params.get("agg_weight_freeze", "unfrozen"),
                 )
 
-                hyperparams = ckpt["hyper_parameters"]["finetuning_args"]
+                hyperparams = fix_finetuning_args(
+                    ckpt["hyper_parameters"]["finetuning_args"]
+                )
 
                 combined_model = SmallMoleculeMultiViewFinetunedModel.from_pretrained(
                     pretrained_model_name_or_path=model_path,
@@ -165,7 +168,9 @@ class SmallMoleculeMultiViewModel(nn.Module):
                 inference_mode=inference_mode,
             )
 
-            hyperparams = ckpt["hyper_parameters"]["finetuning_args"]
+            hyperparams = fix_finetuning_args(
+                ckpt["hyper_parameters"]["finetuning_args"]
+            )
 
             head = MultiTaskPredictionHead(
                 input_dim=model.get_embed_dim(),

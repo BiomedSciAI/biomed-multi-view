@@ -1080,3 +1080,51 @@ V2R:
   path: datasets/raw_data/GPCR/V2R.csv
   preferred_metric: rmse
   task_type: regression
+HLM:
+  collection: ComputationalADME
+  description: "ComputationalADME: LOG HLM_CLint (mL/min/kg)"
+  example: CNc1cc(Nc2cccn(-c3ccccn3)c2=O)nn2c(C(=O)N[C@@H]3C[C@@H]3F)cnc12,0.675686709
+  num_tasks: 1
+  path: datasets/raw_data/ComputationalADME/hlm.csv
+  preferred_metric: rmse
+  task_type: regression
+HPPB:
+  collection: ComputationalADME
+  description: "ComputationalADME: LOG PLASMA PROTEIN BINDING (HUMAN) (% unbound)"
+  example: CNc1cc(Nc2cccn(-c3ccccn3)c2=O)nn2c(C(=O)N[C@@H]3C[C@@H]3F)cnc12,0.991226076
+  num_tasks: 1
+  path: datasets/raw_data/ComputationalADME/hppb.csv
+  preferred_metric: rmse
+  task_type: regression
+MDR1-MDCK-ER:
+  collection: ComputationalADME
+  description: "ComputationalADME: LOG MDR1-MDCK ER (B-A/A-B)"
+  example: CNc1cc(Nc2cccn(-c3ccccn3)c2=O)nn2c(C(=O)N[C@@H]3C[C@@H]3F)cnc12,1.493167369
+  num_tasks: 1
+  path: datasets/raw_data/ComputationalADME/mdr1-mdck-er.csv
+  preferred_metric: rmse
+  task_type: regression
+RLM:
+  collection: ComputationalADME
+  description: "ComputationalADME: LOG RLM_CLint (mL/min/kg)"
+  example: CNc1cc(Nc2cccn(-c3ccccn3)c2=O)nn2c(C(=O)N[C@@H]3C[C@@H]3F)cnc12,1.392169149
+  num_tasks: 1
+  path: datasets/raw_data/ComputationalADME/rlm.csv
+  preferred_metric: rmse
+  task_type: regression
+RPPB:
+  collection: ComputationalADME
+  description: "ComputationalADME: LOG PLASMA PROTEIN BINDING (RAT) (% unbound)"
+  example: CNc1cc(Nc2cccn(-c3ccccn3)c2=O)nn2c(C(=O)N[C@@H]3C[C@@H]3F)cnc12,0.51851394
+  num_tasks: 1
+  path: datasets/raw_data/ComputationalADME/rppb.csv
+  preferred_metric: rmse
+  task_type: regression
+SOLUBILITY:
+  collection: ComputationalADME
+  description: "ComputationalADME: LOG SOLUBILITY PH 6.8 (ug/mL)"
+  example: CNc1cc(Nc2cccn(-c3ccccn3)c2=O)nn2c(C(=O)N[C@@H]3C[C@@H]3F)cnc12,0.089905111
+  num_tasks: 1
+  path: datasets/raw_data/ComputationalADME/solubility.csv
+  preferred_metric: rmse
+  task_type: regression

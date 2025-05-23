@@ -13,6 +13,7 @@ import torchmetrics
 from pytorch_lightning.utilities import grad_norm
 
 import bmfm_sm.core.data_modules.namespace as ns
+from bmfm_sm.api.utils import fix_finetuning_args
 from bmfm_sm.core.data_modules.namespace import TaskType
 from bmfm_sm.core.modules.base_pretrained_model import Modality, MultiTaskPredictionHead
 
@@ -71,7 +72,7 @@ class FineTuneLightningModule(pl.LightningModule):
         self.lr = float(lr)
         self.weight_decay = float(weight_decay)
         self.base_model_class = base_model_class
-        self.finetuning_args = finetuning_args
+        self.finetuning_args = fix_finetuning_args(finetuning_args)
         self.use_multiple_optimizers = self.finetuning_args.get(
             "optimizer_args", {}
         ).get("use_multiple_optimizers", False)
@@ -460,7 +461,6 @@ class FineTuneLightningModule(pl.LightningModule):
             """
             beta1 = self.finetuning_args.get("beta1", 0.9)
             beta2 = self.finetuning_args.get("beta2", 0.999)
-            beta2 = float(beta2)
             optimizer = torch.optim.AdamW(
                 self.parameters(),
                 lr=self.lr,
