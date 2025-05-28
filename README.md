@@ -22,12 +22,9 @@ Our pre-training dataset comprises 200 million molecules sourced from the PubChe
 
 MMELON’s extensible architecture allows for seamless integration of additional views, making it a versatile tool for molecular representation learning. For further details, see [here](https://arxiv.org/abs/2410.19704).
 
-# Getting started with `biomed-multi-view`
+Specifically, this branch is designed to fine-tune MMELON model on the [DREAM Target 2035 Drug Discovery Challenge](https://www.synapse.org/Synapse:syn65660836/wiki/632256). Steps are simplified and slightly difference in this branch. More instructions can be found in the [main branch](https://github.com/BiomedSciAI/biomed-multi-view).
 
-## Links
-
-1. [Demo Notebook for inference](notebooks/smmv_api_demo.ipynb)
-2. [Contributing code](CONTRIBUTING.md)
+# Getting started with `MMELON`
 
 ## Installation
 Follow these steps to set up the `biomed-multi-view` codebase on your system.
@@ -130,247 +127,98 @@ pip install -r requirements-mps.txt
 python -m unittest bmfm_sm.tests.all_tests
 ```
 
-### Explore the pretrained and finetuned checkpoints from HuggingFace
-
-To explore the pretrained and finetuned models, please refer to the [demo notebook](notebooks/smmv_api_demo.ipynb). This notebook provides detailed examples and explanations on how to use the models effectively. You can launch the notebook from running the following command from a new terminal window.
-
-```bash
-cd $ROOT_DIR/code/biomed-multi-view
-jupyter lab
-```
-Copy the URL displayed on the console and paste it on a browser tab. The URL should look something similar to the below
-```bash
-http://localhost:8888/lab?token=67f8a92c257a82010b4f82b219f7c1ad675ee329e730321e
-```
-Navigate to the notebooks directory in the sidepanel in the Jupyter Lab GUI to locate the notebook named `smmv_api_demo.ipynb`.
-
-#### Get embeddings from the pretrained model
-
-You can generate embeddings for a given molecule using the pretrained model with the following code. You can excute from cell 1 to 5 in the notebook run the same.
-
-``` python
-from bmfm_sm.api.smmv_api import SmallMoleculeMultiViewModel
-
-# Example SMILES string for a molecule
-example_smiles = "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"
-
-# Obtain embeddings from the pretrained model
-example_emb = SmallMoleculeMultiViewModel.get_embeddings(
-    smiles=example_smiles,
-    model_path="ibm/biomed.sm.mv-te-84m",
-    huggingface=True,
-)
-print(example_emb)
-```
-
-This will output the embedding vector for the given molecule.
-
-#### Inference using finetuned model
-You can use the finetuned models to make predictions on new data. You can execute through cell 6 to 8 in the notebook to run the same.
-
-``` python
-from bmfm_sm.api.smmv_api import SmallMoleculeMultiViewModel
-from bmfm_sm.api.dataset_registry import DatasetRegistry
-
-# Initialize the dataset registry
-dataset_registry = DatasetRegistry()
-
-# Example SMILES string
-example_smiles = "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"
-
-# Get dataset information for BACE (classification task)
-bace_ds = dataset_registry.get_dataset_info('BACE')
-
-# Load the finetuned model for BACE
-finetuned_model_ds = SmallMoleculeMultiViewModel.from_finetuned(
-    bace_ds,
-    model_path="ibm/biomed.sm.mv-te-84m-MoleculeNet-ligand_scaffold-BACE-101",
-    inference_mode=True,
-    huggingface=True
-)
-
-# Get predictions
-bace_prediction = SmallMoleculeMultiViewModel.get_predictions(
-    example_smiles, bace_ds, finetuned_model=finetuned_model_bace
-)
-
-print("BACE Prediction:", bace_prediction)
-```
-
-##### Output:
-```bash
-BACE Prediction: {'prediction': tensor(0, dtype=torch.int32)}
-```
-Note: The outputs are illustrative. Actual predictions may vary depending on the model and data. For more detailed examples and explanations, please refer to the [demo notebook](notebooks/smmv_api_demo.ipynb) cell 8.
-
 ## Data preparation
 To evaluate and train the models, you need to set up the necessary data, splits, configuration files, and model checkpoints. This section will guide you through the process.
 
 #### Step 1: Set up the `$data_root` directory
 First, create a directory to serve as your root directory for all the data. This directory will house all datasets, splits, configuration files, and model checkpoints.
 ```bash
-mkdir -p $ROOT_DIR/data_root
+mkdir -p $ROOT_DIR/code/biomed-multi-view/data_root
 ```
 
 #### Step 2: Set the environment variable
 Set the `$BMFM_HOME` environment variable to point to your data root directory. This helps the scripts locate your data.
 ```bash
-export BMFM_HOME=$ROOT_DIR/data_root
+export BMFM_HOME=$ROOT_DIR/code/biomed-multi-view/data_root
 ```
 Optionally, add the export command to your shell configuration file (e.g., $HOME/.bashrc for bash):
 ```bash
-echo 'export BMFM_HOME=$ROOT_DIR/data_root' >> $HOME/.bashrc
+echo 'export BMFM_HOME=$ROOT_DIR/code/biomed-multi-view/data_root' >> $HOME/.bashrc
 ```
 
-#### Step 3: Download the data splits, configuration files and checkpoints
+#### Step 3: Download the checkpoints and DREAM Challenge data
 We provide all the necessary data splits, configuration files, and model checkpoints in a single archive to simplify the setup process.
 
-* Download `data_root_os_v1.tar.gz`: from [this location](https://ad-prod-biomed.s3.us-east-1.amazonaws.com/biomed.multi-view/data_root_os_v1.tar.gz).
+* Download `data_root_dream.tar.gz`: from [this location](https://ad-prod-biomed.s3.us-east-1.amazonaws.com/biomed.multi-view/data_root_os_v1.tar.gz).
 * Extract the Archive: 	Uncompress the tar file into your data root directory
   ```bash
-  tar -xzvf data_root_os_v1.tar.gz -C $BMFM_HOME
+  tar -xzvf data_root_dream.tar.gz -C $BMFM_HOME
   ```
 This will populate `$BMFM_HOME` with the required files and directories.
 
-#### Step 4. Download MoleculeNet datasets
-We provide a script to download the MoleculeNet datasets automatically that you can run:
-```bash
-run-download-moleculenet
-```
-This script will download the MoleculeNet datasets into `$BMFM_HOME/datasets/raw_data/MoleculeNet/`. **Note**: The `run-download-moleculenet` command launches a Python script that can be executed using `bmfm_sm.python -m bmfm_sm.launch.download_molecule_net_data` from `$ROOT_DIR/code/biomed-multi-view` directory as well.
-
-#### Step 5. Verify the directory structure
+#### Step 4. Verify the directory structure
 After completing the above steps, your `$BMFM_HOME` directory should have the following structure:
 ```bash
-$BMFM_HOME/
+tree $BMFM_HOME
+$BMFM_HOME
 ├── bmfm_model_dir
-│   ├── finetuned
-│   │   └── MULTIVIEW_MODEL
-│   │       └── MoleculeNet
-│   │           └── ligand_scaffold
-│   └── pretrained
-│       └── MULTIVIEW_MODEL
-│           ├── biomed-smmv-base.pth
-│           └── biomed-smmv-with-coeff-agg.pth
-├── configs_finetune
-│   └── MULTIVIEW_MODEL
-│       └── MoleculeNet
-│           └── ligand_scaffold
-│               ├── BACE
-│               ├── BBBP
-│               ├── CLINTOX
-│               ├── ESOL
-│               ├── FREESOLV
-│               ├── HIV
-│               ├── LIPOPHILICITY
-│               ├── MUV
-│               ├── QM7
-│               ├── SIDER
-│               ├── TOX21
-│               └── TOXCAST
+│   └── pretrained
+│       └── MULTIVIEW_MODEL
+│           ├── biomed-smmv-base.pth
+│           └── biomed-smmv-with-coeff-agg.pth
 └── datasets
     ├── raw_data
-    │   └── MoleculeNet
-    │       ├── bace.csv
-    │       ├── bbbp.csv
-    │       ├── clintox.csv
-    │       ├── esol.csv
-    │       ├── freesolv.csv
-    │       ├── hiv.csv
-    │       ├── lipophilicity.csv
-    │       ├── muv.csv
-    │       ├── qm7.csv
-    │       ├── qm9.csv
-    │       ├── sider.csv
-    │       ├── tox21.csv
-    │       └── toxcast.csv
+    │   └── other
+    │       ├── dreamtarget2035_test.csv
+    │       └── dreamtarget2035_train.csv
     └── splits
-        └── MoleculeNet
-            └── ligand_scaffold
-                ├── bace_split.json
-                ├── bbbp_split.json
-                ├── clintox_split.json
-                ├── esol_split.json
-                ├── freesolv_split.json
-                ├── hiv_split.json
-                ├── lipophilicity_split.json
-                ├── muv_split.json
-                ├── qm7_split.json
-                ├── sider_split.json
-                ├── tox21_split.json
-                └── toxcast_split.json
+        └── other
+            └── random
+                ├── dreamtarget2035_test_split.json
+                └── dreamtarget2035_train_split.json
 ```
 
-After successfully completing the installation and data preparation steps, you are now ready to:
-
-* Usage: Learn how to obtain embeddings from the pretrained model.
-* Evaluation: Assess the model’s performance on benchmark datasets using our pretrained checkpoints.
-* Training: Understand how to finetune the pretrained model using the provided configuration files.
-* Inference: Run the model on sample data in inference mode to make predictions.
-
-
-### Evaluation
-We provide the `run-finetune` command for running finetuning and evaluation processes. You can use this command to evaluate the performance of the finetuned models on various datasets. **Note**: The `run-finetune` command launches a Python script that can be executed using `bmfm_sm.python -m launch.download_molecule_net_data` from `$ROOT_DIR/code/biomed-multi-view` directory as well.
-
-To see the usage options for the script, run:
-```bash
-run-finetune --help
-```
-
-This will display:
-``` bash
-Usage: run-finetune [OPTIONS]
-
-Options:
-  --model TEXT           Model name
-  --dataset-group TEXT   Dataset group name
-  --split-strategy TEXT  Split strategy name
-  --dataset TEXT         Dataset name
-  --fit                  Run training (fit)
-  --test                 Run testing
-  -o, --override TEXT    Override parameters in key=value format (e.g.,
-                         trainer.max_epochs=10)
-  --help                 Show this message and exit.
-```
-
-To evaluate a finetuned checkpoint on a specific dataset, use the --test option along with the --dataset parameter. For example, to evaluate on the BBBP dataset:
-
-``` bash
-python run-finetune --test --dataset BBBP
-```
-If you omit the `--dataset` option, the script will prompt you to choose a dataset:
-```bash
-python run-finetune --test
-Please choose a dataset (FREESOLV, BBBP, CLINTOX, MUV, TOXCAST, QM9, BACE, LIPOPHILICITY, ESOL, HIV, TOX21, SIDER, QM7): BBBP
-```
-This command will evaluate the finetuned checkpoint corresponding to the BBBP dataset using the test set of the `ligand_scaffold` split.
-
-
-### Training (finetuning)
+### Finetuning
 To finetune the pretrained model on a specific dataset, use the --fit option:
-
 ``` bash
-python run-finetune --fit --dataset BBBP
+cd $ROOT_DIR/code/biomed-multi-view/
+python -m bmfm_sm.launch.run_finetune --fit --dataset dreamtarget2035 --config config_train.yaml
 ```
-Again, if you omit the --dataset option, the script will prompt you to select one:
+This command will start the finetuning process for the DREAM dataset using the train configuration file. As an example, we simply created the training data (n=100) by combinining 14 public-domain WDR91 ligands (label = 1) and 86 randomly selected compounds from the 339k set (label = 0).
+
+To make predictions on testing dataset, use the --test option:
+``` bash
+python -m bmfm_sm.launch.run_finetune --test --dataset dreamtarget2035 --config config_test.yaml
+```
+This command will start the predicting process on the DREAM testing set of 339k compounds. The finetuned model and predictions will be saved in the outputs folder with a structure like this:
+```bash
+outputs/
+└── MULTIVIEW_MODEL
+    └── pred_MULTIVIEW_MODEL_ft_dreamtarget2035_random_s-101_f-1.0
+        ├── checkpoints
+        │   ├── best.ckpt
+        │   └── last.ckpt
+        ├── logs
+        │   └── lightning_logs
+        │       ├── version_0
+        │       │   ├── config.yaml
+        │       │   ├── events.out.tfevents.1748395567.teddy.2372031.0
+        │       │   └── hparams.yaml
+        │       └── version_1
+        │           ├── config.yaml
+        │           ├── events.out.tfevents.1748395893.teddy.2376790.0
+        │           └── hparams.yaml
+        ├── modality_coeff_test_version_1.csv
+        ├── parameter_norms_version_0.png
+        ├── resolved_config.yaml
+        └── test_predictions_version_1.csv
+```
+Note that in the prediction table **test_predictions_version_1.csv**, values are output logits that can be transformed to probablities via sigmoid. An example script is also provided to transform and select top 50 predictions for Challenge step 2:
 
 ```bash
-python run-finetune --fit
-Please choose a dataset (FREESOLV, BBBP, CLINTOX, MUV, TOXCAST, QM9, BACE, LIPOPHILICITY, ESOL, HIV, TOX21, SIDER, QM7): BBBP
+python transform_and_select_top_predictions.py 
 ```
-This command will start the finetuning process for the BBBP dataset using the configuration files provided in the `configs_finetune` directory.
-
-Note: You can override default parameters using the `-o` or `--override` option. For example:
-
-```bash
-python run-finetune --fit --dataset BBBP -o trainer.max_epochs=10
-```
-
-**Note**: If you run into out of memory errors, you can reduce the batch size using the following syntax
-
-```bash
-python run-finetune --fit --dataset BBBP -o data.init_args.batch_size=4
-```
+This script creates a submission file **Step2-submission-file.csv** of top 50 predicted compounds for Challenge step 2.
 
 # Citations
 
