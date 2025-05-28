@@ -149,7 +149,7 @@ echo 'export BMFM_HOME=$ROOT_DIR/code/biomed-multi-view/data_root' >> $HOME/.bas
 #### Step 3: Download the checkpoints and DREAM Challenge data
 We provide all the necessary data splits, configuration files, and model checkpoints in a single archive to simplify the setup process.
 
-* Download `data_root_dream.tar.gz`: from [this location](https://ad-prod-biomed.s3.us-east-1.amazonaws.com/biomed.multi-view/data_root_os_v1.tar.gz).
+* Download `data_root_dream.tar.gz`: from [this location](https://ibm.box.com/s/t0l7efzu5ty4pp3f9s2dhallt7kmzspf).
 * Extract the Archive: 	Uncompress the tar file into your data root directory
   ```bash
   tar -xzvf data_root_dream.tar.gz -C $BMFM_HOME
