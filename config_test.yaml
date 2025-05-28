@@ -1,0 +1,85 @@
+expt:
+  name: pred_MULTIVIEW_MODEL_ft_dreamtarget2035_random_s-101_f-1.0
+  dataset: dreamtarget2035
+  split_strategy: random
+  model: MULTIVIEW_MODEL
+  ckpt: data_root/bmfm_model_dir/pretrained/MULTIVIEW_MODEL/biomed-smmv-with-coeff-agg.pth
+  seed: 101
+  train_frac: 1.0
+seed_everything: 101
+trainer:
+  max_epochs: 200
+  default_root_dir: outputs/MULTIVIEW_MODEL/pred_MULTIVIEW_MODEL_ft_dreamtarget2035_random_s-101_f-1.0
+  fast_dev_run: false
+  accelerator: auto
+  devices: 1
+  num_nodes: 1
+  logger:
+    class_path: pytorch_lightning.loggers.TensorBoardLogger
+    init_args:
+      save_dir: outputs/MULTIVIEW_MODEL/pred_MULTIVIEW_MODEL_ft_dreamtarget2035_random_s-101_f-1.0/logs
+  log_every_n_steps: 10
+  callbacks:
+  - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+    init_args:
+      dirpath: outputs/MULTIVIEW_MODEL/pred_MULTIVIEW_MODEL_ft_dreamtarget2035_random_s-101_f-1.0/checkpoints
+      filename: best
+      monitor: val_rocauc
+      save_top_k: 1
+      save_last: true
+      mode: max
+  - class_path: pytorch_lightning.callbacks.EarlyStopping
+    init_args:
+      patience: 20
+      monitor: val_rocauc
+      mode: max
+  - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: step
+  - class_path: bmfm_sm.core.modules.callbacks.LogModelParameterChanges
+  gradient_clip_val: '1.0'
+model:
+  class_path: bmfm_sm.predictive.modules.finetune_lightning_module.FineTuneLightningModule
+  init_args:
+    base_model_class: bmfm_sm.predictive.modules.smmv_model.SmallMoleculeMultiView
+    model_params:
+      agg_arch: coeff_mlp
+      agg_gate_input: TBD
+      agg_weight_freeze: unfrozen
+    task_type: classification
+    num_tasks: 1
+    checkpoint_path: data_root/bmfm_model_dir/pretrained/MULTIVIEW_MODEL/biomed-smmv-with-coeff-agg.pth
+    lr: '0.0001'
+    finetuning_args:
+      weight_freeze: gradual
+      initialization: xavier
+      scheduler: null
+      head_arch: mlp
+      use_norm: false
+      beta2: '0.999'
+      class_weights:
+      - - 0.86
+        - 0.14
+    weight_decay: '0.01'
+data:
+  class_path: bmfm_sm.core.data_modules.base_data_module.BaseDataModule
+  init_args:
+    dataset_class: bmfm_sm.predictive.data_modules.multimodal_finetune_dataset.MultiModalFinetuneDataPipeline
+    data_dir: data_root/datasets/raw_data/other
+    batch_size: 32
+    pin_memory: false
+    num_workers: 1
+    dataset_args:
+      split_file: data_root/datasets/splits/other/random/dreamtarget2035_test_split.json
+      task_type: classification
+      val_size: 0.1
+      test_size: 0.1
+      train_size: 1.0
+      adaptive_sampling: false
+      adaptive_sampling_num_bins: 5
+      adaptive_sampling_budget: 1500
+      modalities:
+      - GRAPH_2D_MODEL
+      - IMAGE_MODEL
+      - TEXT_MODEL
+ckpt_path: outputs/MULTIVIEW_MODEL/pred_MULTIVIEW_MODEL_ft_dreamtarget2035_random_s-101_f-1.0/checkpoints/best.ckpt
