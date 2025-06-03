@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 from huggingface_hub import PyTorchModelHubMixin
 
+from bmfm_sm.api.utils import fix_finetuning_args
 from bmfm_sm.core.data_modules.namespace import TaskType
 from bmfm_sm.core.modules.base_pretrained_model import MultiTaskPredictionHead
 from bmfm_sm.predictive.modules.smmv_model import SmallMoleculeMultiView
@@ -168,7 +169,7 @@ class SmallMoleculeMultiViewFinetunedModel(
             if "task_type" in hpars:
                 model_kwargs["task_type"] = hpars.get("task_type")
 
-            finetuning_args = hpars["finetuning_args"]
+            finetuning_args = fix_finetuning_args(hpars["finetuning_args"])
             model_kwargs["head"] = finetuning_args.get("head_arch", "mlp")
             model_kwargs["hidden_dims"] = finetuning_args.get(
                 "mlp_hidden_dims", [512, 384]

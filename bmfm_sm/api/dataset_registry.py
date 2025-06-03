@@ -137,6 +137,7 @@ class DatasetCollection(Enum):
     CYP = "CYP"
     ALL = "All"
     GPCR = "GPCR"
+    COMPUTATIONALADME = "ComputationalADME"
 
 
 @dataclass
