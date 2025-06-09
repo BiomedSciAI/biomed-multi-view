@@ -1,0 +1,46 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python package
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: build-${{ matrix.os.os }}
+    runs-on: ${{ matrix.os.os }}
+    strategy:
+      matrix:
+        os: [{"os": "ubuntu-latest", "req": ""}, {"os": "macos-latest", "req": "-mps"}]
+        python-version: ["3.11"]
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        python-version: ${{ matrix.python-version }}
+        activate-environment: biomed-multiview
+        auto-activate-base: false
+    - name: Conda info
+      run: conda info
+    - name: Install package
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        python -c "import torch; print(torch.__version__)"
+        pip install -r requirements${{ matrix.os.req }}.txt
+        pip install pre-commit pytest
+    - name: Pre-Commit Hooks
+      run: |
+        pre-commit install
+        pre-commit run --all-files --show-diff-on-failure
+    - name: Unit Tests
+      run: |
+        python -m unittest bmfm_sm.tests.all_tests
