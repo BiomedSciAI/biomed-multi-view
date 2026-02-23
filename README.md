@@ -4,7 +4,7 @@
 
 # Introduction
 
-This repository contains the implementation of the Multi-view Molecular Embedding with Late Fusion (MMELON) architecture presented in our preprint [Multi-view biomedical foundation models for molecule-target and property prediction](https://arxiv.org/abs/2410.19704). MMELON is a flexible approach to aggregate multiple views (sequence, image, graph) of molecules in a foundation model setting. While models based on single view representation typically performs well on some downstream tasks and not others, the multi-view model performs robustly across a wide range of property prediction tasks encompassing ligand-protein binding, molecular solubility, metabolism and toxicity. It has been applied to screen compounds against a large (> 100 targets) set of G Protein-Coupled receptors (GPCRs) to identify strong binders for 33 targets related to Alzheimer’s disease, which are validated through structure-based modeling and identification of key binding motifs.
+This repository contains the implementation of the Multi-view Molecular Embedding with Late Fusion (MMELON) architecture presented in our preprint [Multi-view biomedical foundation models for molecule-target and property prediction](https://advanced.onlinelibrary.wiley.com/doi/10.1002/advs.202517840). MMELON is a flexible approach to aggregate multiple views (sequence, image, graph) of molecules in a foundation model setting. While models based on single view representation typically performs well on some downstream tasks and not others, the multi-view model performs robustly across a wide range of property prediction tasks encompassing ligand-protein binding, molecular solubility, metabolism and toxicity. It has been applied to screen compounds against a large (> 100 targets) set of G Protein-Coupled receptors (GPCRs) to identify strong binders for 33 targets related to Alzheimer’s disease, which are validated through structure-based modeling and identification of key binding motifs.
 
 Our model integrates:
 
@@ -375,13 +375,12 @@ python run-finetune --fit --dataset BBBP -o data.init_args.batch_size=4
 # Citations
 
 ```
-@misc{suryanarayanan2024multiviewbiomedicalfoundationmodels,
-      title={Multi-view biomedical foundation models for molecule-target and property prediction},
-      author={Parthasarathy Suryanarayanan and Yunguang Qiu and Shreyans Sethi and Diwakar Mahajan and Hongyang Li and Yuxin Yang and Elif Eyigoz and Aldo Guzman Saenz and Daniel E. Platt and Timothy H. Rumbell and Kenney Ng and Sanjoy Dey and Myson Burch and Bum Chul Kwon and Pablo Meyer and Feixiong Cheng and Jianying Hu and Joseph A. Morrone},
-      year={2024},
-      eprint={2410.19704},
-      archivePrefix={arXiv},
-      primaryClass={q-bio.BM},
-      url={https://arxiv.org/abs/2410.19704},
+@article{suryanarayanan2024multi,
+  title={Multi-View Biomedical Foundation Models for Molecule-Target and Property Prediction},
+  author={Suryanarayanan, Parthasarathy and Qiu, Yunguang and Sethi, Shreyans and Mahajan, Diwakar and Li, Hongyang and Yang, Yuxin and Eyigoz, Elif and Guzm{\'a}n-S{\'a}enz, Aldo and Platt, Daniel E and Rumbell, Timothy H and others},
+  journal={Advanced Science},
+  pages={e17840},
+  year={2024},
+  publisher={Wiley Online Library}
 }
 ```
