@@ -3,4 +3,4 @@ torch_scatter
 torch_cluster
 torch_spline_conv
 -f https://data.pyg.org/whl/torch-2.1.0+cpu.html
-pytorch-fast-transformers==0.4.0
+pytorch-fast-transformers==0.4.0 --no-build-isolation
