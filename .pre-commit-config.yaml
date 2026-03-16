@@ -1,0 +1,36 @@
+repos:
+  # default hooks provided by the pre-commit project
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-ast
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-yaml
+      - id: check-toml
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+  # autoflake: Automatically resolves starred imports, makes them explicit
+  - repo: https://github.com/myint/autoflake
+    rev: v2.3.1  # Specify the latest version
+    hooks:
+      - id: autoflake
+        args: [--remove-all-unused-imports, --expand-star-imports, --in-place]
+  # Ruff-related pre-commit hooks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.284
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi]
+  # black: automatic pep8 compliance code formatting
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
